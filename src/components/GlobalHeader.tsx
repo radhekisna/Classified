@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX, Music, HelpCircle, Settings } from 'lucide-react';
+import { Volume2, VolumeX, Music, HelpCircle } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 interface GlobalHeaderProps {
@@ -7,7 +7,6 @@ interface GlobalHeaderProps {
   isWelcomeScreen: boolean;
   isFinale: boolean;
   onOpenHint?: () => void;
-  onOpenAdmin: () => void;
   soundMuted: boolean;
   onToggleSound: () => void;
   ambientPlaying: boolean;
@@ -19,7 +18,6 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
   isWelcomeScreen,
   isFinale,
   onOpenHint,
-  onOpenAdmin,
   soundMuted,
   onToggleSound,
   ambientPlaying,
@@ -87,20 +85,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
           )}
         </button>
 
-        {/* Developer / Admin Quick Switch */}
-        <button
-          onClick={() => {
-            sound.playClick();
-            onOpenAdmin();
-          }}
-          className="p-2 rounded-full bg-surface-200/70 hover:bg-surface-100 text-cream-400 hover:text-crimson-light border border-white/10 backdrop-blur-md transition-all duration-200"
-          title="Secret Inspector Panel (Test / Jump Levels / View Answers)"
-          aria-label="Inspector Panel"
-        >
-          <Settings className="w-4 h-4" />
-        </button>
-
-        {/* 03 YEARS Badge */}
+        {/* 02 YEARS Badge */}
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-200/80 border border-crimson/20 backdrop-blur-md shadow-sm">
           <span className="font-mono text-xs md:text-sm font-bold tracking-widest text-crimson-light">
             02 YEARS

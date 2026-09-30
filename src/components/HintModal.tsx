@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, HelpCircle, Eye, AlertTriangle } from 'lucide-react';
+import { X, HelpCircle, AlertTriangle } from 'lucide-react';
 import { sound } from '../utils/sound';
 
 interface HintModalProps {
@@ -8,7 +8,6 @@ interface HintModalProps {
   onClose: () => void;
   hint: string;
   levelTitle: string;
-  secretAnswer: string;
 }
 
 export const HintModal: React.FC<HintModalProps> = ({
@@ -16,10 +15,7 @@ export const HintModal: React.FC<HintModalProps> = ({
   onClose,
   hint,
   levelTitle,
-  secretAnswer,
 }) => {
-  const [showAnswer, setShowAnswer] = React.useState(false);
-
   if (!isOpen) return null;
 
   return (
@@ -33,7 +29,6 @@ export const HintModal: React.FC<HintModalProps> = ({
           onClick={() => {
             sound.playClick();
             onClose();
-            setShowAnswer(false);
           }}
           className="fixed inset-0 bg-black/80 backdrop-blur-sm"
         />
@@ -64,7 +59,6 @@ export const HintModal: React.FC<HintModalProps> = ({
               onClick={() => {
                 sound.playClick();
                 onClose();
-                setShowAnswer(false);
               }}
               className="p-1 rounded-lg hover:bg-white/10 text-cream-400 hover:text-white transition-colors"
               aria-label="Close Hint"
@@ -90,42 +84,18 @@ export const HintModal: React.FC<HintModalProps> = ({
               </p>
             </div>
 
-            {/* Emergency override button */}
-            <div className="pt-2 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => {
-                  sound.playClick();
-                  setShowAnswer(!showAnswer);
-                }}
-                className="font-mono text-[11px] text-cream-500 hover:text-cream-300 flex items-center gap-1.5 transition-colors"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>{showAnswer ? 'Hide Solution' : 'Emergency Reveal'}</span>
-              </button>
-
+            <div className="pt-2 flex justify-end">
               <button
                 type="button"
                 onClick={() => {
                   sound.playClick();
                   onClose();
-                  setShowAnswer(false);
                 }}
-                className="px-4 py-2 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-mono text-cream-200 hover:text-white transition-colors"
+                className="px-5 py-2.5 rounded-lg bg-surface-100 hover:bg-surface-50 border border-white/10 text-xs font-mono text-cream-200 hover:text-white transition-colors cursor-pointer"
               >
-                Got It
+                Understood, Detective
               </button>
             </div>
-
-            {showAnswer && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="p-3 rounded-lg bg-crimson/15 border border-crimson/30 text-xs font-mono text-crimson-light"
-              >
-                Direct passcode: <strong>{secretAnswer}</strong>
-              </motion.div>
-            )}
           </div>
         </motion.div>
       </div>

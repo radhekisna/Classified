@@ -10,7 +10,6 @@ import { LevelCard } from './components/LevelCard';
 import { FinaleScreen } from './components/FinaleScreen';
 import { HintModal } from './components/HintModal';
 import { SimulatedDriveModal } from './components/SimulatedDriveModal';
-import { AdminDrawer } from './components/AdminDrawer';
 
 export const App: React.FC = () => {
   // Local state for puzzle progression (with localStorage backup)
@@ -33,7 +32,6 @@ export const App: React.FC = () => {
   const [ambientPlaying, setAmbientPlaying] = useState<boolean>(false);
   const [isHintOpen, setIsHintOpen] = useState(false);
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   // Sync level changes with localStorage
   useEffect(() => {
@@ -106,7 +104,6 @@ export const App: React.FC = () => {
         isWelcomeScreen={isWelcomeScreen}
         isFinale={isFinale}
         onOpenHint={() => setIsHintOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
         soundMuted={soundMuted}
         onToggleSound={handleToggleSound}
         ambientPlaying={ambientPlaying}
@@ -157,7 +154,6 @@ export const App: React.FC = () => {
           onClose={() => setIsHintOpen(false)}
           hint={currentLevel.hint}
           levelTitle={currentLevel.title}
-          secretAnswer={currentLevel.secretAnswer}
         />
       )}
 
@@ -172,16 +168,6 @@ export const App: React.FC = () => {
           levelTitle={currentLevel.title}
         />
       )}
-
-      {/* Director / Developer Inspector Drawer */}
-      <AdminDrawer
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        config={puzzleConfig}
-        currentLevelIndex={currentLevelIndex}
-        onSelectLevel={(idx) => setCurrentLevelIndex(idx)}
-        onResetAll={handleRestart}
-      />
     </div>
   );
 };
