@@ -1,9 +1,10 @@
+import romanticSongUrl from '../assets/paulyudin-romantic-romantic-music-493488.mp3';
+
 // Web Audio API synthesizer for tactile mystery escape-room sound effects
 class SoundController {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
-  private ambientOsc: OscillatorNode | null = null;
-  private ambientGain: GainNode | null = null;
+  private bgAudio: HTMLAudioElement | null = null;
   private isAmbientPlaying: boolean = false;
 
   private initCtx() {
@@ -18,10 +19,8 @@ class SoundController {
 
   public setMuted(muted: boolean) {
     this.isMuted = muted;
-    if (muted && this.ambientGain && this.ctx) {
-      this.ambientGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
-    } else if (!muted && this.isAmbientPlaying && this.ambientGain && this.ctx) {
-      this.ambientGain.gain.setTargetAtTime(0.04, this.ctx.currentTime, 0.5);
+    if (this.bgAudio) {
+      this.bgAudio.muted = muted;
     }
   }
 
@@ -180,52 +179,48 @@ class SoundController {
     }
   }
 
-  // Ambient romantic mystery tone
-  public toggleAmbient() {
-    this.initCtx();
-    if (!this.ctx) return false;
+  // Start ambient romantic song playback
+  public startAmbient(): boolean {
+    if (!this.bgAudio) {
+      this.bgAudio = new Audio(romanticSongUrl);
+      this.bgAudio.loop = true;
+      this.bgAudio.volume = 0.35;
+      this.bgAudio.muted = this.isMuted;
+    }
+
+    if (!this.isAmbientPlaying) {
+      this.bgAudio.play().then(() => {
+        this.isAmbientPlaying = true;
+      }).catch(() => {
+        this.isAmbientPlaying = false;
+      });
+      this.isAmbientPlaying = true;
+      return true;
+    }
+    return true;
+  }
+
+  // Ambient romantic song playback
+  public toggleAmbient(): boolean {
+    if (!this.bgAudio) {
+      this.bgAudio = new Audio(romanticSongUrl);
+      this.bgAudio.loop = true;
+      this.bgAudio.volume = 0.35;
+      this.bgAudio.muted = this.isMuted;
+    }
 
     if (this.isAmbientPlaying) {
-      if (this.ambientGain && this.ctx) {
-        this.ambientGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.4);
-      }
-      if (this.ambientOsc && this.ctx) {
-        try {
-          this.ambientOsc.stop(this.ctx.currentTime + 0.45);
-        } catch {
-          // safe
-        }
-        this.ambientOsc = null;
-      }
+      this.bgAudio.pause();
       this.isAmbientPlaying = false;
       return false;
     } else {
-      try {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const filter = this.ctx.createBiquadFilter();
-
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(65.41, this.ctx.currentTime); // C2 warm drone
-
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(220, this.ctx.currentTime);
-
-        gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(this.isMuted ? 0 : 0.035, this.ctx.currentTime + 2);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start();
-        this.ambientOsc = osc;
-        this.ambientGain = gain;
+      this.bgAudio.play().then(() => {
         this.isAmbientPlaying = true;
-        return true;
-      } catch {
-        return false;
-      }
+      }).catch(() => {
+        this.isAmbientPlaying = false;
+      });
+      this.isAmbientPlaying = true;
+      return true;
     }
   }
 

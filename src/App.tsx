@@ -54,6 +54,8 @@ export const App: React.FC = () => {
       : null;
 
   const handleStart = () => {
+    sound.startAmbient();
+    setAmbientPlaying(true);
     setCurrentLevelIndex(1);
   };
 

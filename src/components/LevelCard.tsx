@@ -3,6 +3,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { ExternalLink, CheckCircle2, AlertCircle, ArrowRight, Unlock, Lock, FolderOpen } from 'lucide-react';
 import type { PuzzleLevel } from '../config/puzzles';
 import { KeypadInput } from './KeypadInput';
+import { AudioPlayer } from './AudioPlayer';
 import { sound } from '../utils/sound';
 
 interface LevelCardProps {
@@ -194,6 +195,11 @@ export const LevelCard: React.FC<LevelCardProps> = ({
               <ExternalLink className="w-3.5 h-3.5 text-cream-400 group-hover:text-cream-100" />
             </button>
           </div>
+        )}
+
+        {/* Interactive Audio Player for Soundtrack Level */}
+        {level.audioUrl && (
+          <AudioPlayer src={level.audioUrl} title={level.audioTitle} />
         )}
 
         {/* Puzzle Interactive Input Section */}

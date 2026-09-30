@@ -1,3 +1,7 @@
+import romanticSongUrl from '../assets/paulyudin-romantic-romantic-music-493488.mp3';
+
+export { romanticSongUrl };
+
 export interface PuzzleLevel {
   id: number;
   levelCode: string;
@@ -8,6 +12,8 @@ export interface PuzzleLevel {
   humorousSubtext: string;
   driveButtonText?: string;
   driveUrl?: string;
+  audioUrl?: string;
+  audioTitle?: string;
   driveSimulatedFolder?: {
     name: string;
     files: Array<{
@@ -215,6 +221,8 @@ export const puzzleConfig: AnniversaryConfig = {
       ],
       humorousNote: "Friendly reminder: Neither of us can hit that bridge vocal.",
       humorousSubtext: "Our neighbors have suffered enough.",
+      audioUrl: romanticSongUrl,
+      audioTitle: "Evidence Tape // Our First Song",
       // Level 04 does NOT use Google Drive
       promptText: "Enter the moment timestamp range:",
       inputPlaceholder: "0:30-0:43",
