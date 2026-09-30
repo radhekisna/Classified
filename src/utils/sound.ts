@@ -9,7 +9,9 @@ class SoundController {
 
   private initCtx() {
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AudioCtx();
     }
     if (this.ctx.state === 'suspended') {
@@ -17,10 +19,26 @@ class SoundController {
     }
   }
 
+  private getOrCreateBgAudio(): HTMLAudioElement {
+    if (!this.bgAudio) {
+      this.bgAudio = new Audio(romanticSongUrl);
+      this.bgAudio.loop = true;
+      this.bgAudio.volume = this.isMuted ? 0 : 0.35;
+      this.bgAudio.muted = this.isMuted;
+    }
+    return this.bgAudio;
+  }
+
   public setMuted(muted: boolean) {
     this.isMuted = muted;
     if (this.bgAudio) {
       this.bgAudio.muted = muted;
+      this.bgAudio.volume = muted ? 0 : 0.35;
+      if (muted) {
+        this.bgAudio.pause();
+      } else if (this.isAmbientPlaying) {
+        this.bgAudio.play().catch(() => {});
+      }
     }
   }
 
@@ -157,7 +175,7 @@ class SoundController {
       sub.stop(this.ctx.currentTime + 0.6);
 
       // Triumph chord
-      const chords = [523.25, 659.25, 783.99, 1046.50]; // C Major
+      const chords = [523.25, 659.25, 783.99, 1046.5]; // C Major
       chords.forEach((freq, idx) => {
         if (!this.ctx) return;
         const osc = this.ctx.createOscillator();
@@ -181,51 +199,61 @@ class SoundController {
 
   // Start ambient romantic song playback
   public startAmbient(): boolean {
-    if (!this.bgAudio) {
-      this.bgAudio = new Audio(romanticSongUrl);
-      this.bgAudio.loop = true;
-      this.bgAudio.volume = 0.35;
-      this.bgAudio.muted = this.isMuted;
+    const audio = this.getOrCreateBgAudio();
+    this.isAmbientPlaying = true;
+
+    if (this.isMuted) {
+      audio.pause();
+      return true;
     }
 
-    if (!this.isAmbientPlaying) {
-      this.bgAudio.play().then(() => {
-        this.isAmbientPlaying = true;
-      }).catch(() => {
-        this.isAmbientPlaying = false;
+    if (audio.paused) {
+      audio.volume = 0.35;
+      audio.muted = false;
+      audio.play().catch(() => {
+        // Autoplay policy prevented playback
       });
-      this.isAmbientPlaying = true;
-      return true;
     }
     return true;
   }
 
-  // Ambient romantic song playback
-  public toggleAmbient(): boolean {
-    if (!this.bgAudio) {
-      this.bgAudio = new Audio(romanticSongUrl);
-      this.bgAudio.loop = true;
-      this.bgAudio.volume = 0.35;
-      this.bgAudio.muted = this.isMuted;
-    }
-
-    if (this.isAmbientPlaying) {
+  // Pause ambient song (e.g. when user plays tape or pauses)
+  public pauseAmbient() {
+    if (this.bgAudio && !this.bgAudio.paused) {
       this.bgAudio.pause();
+    }
+  }
+
+  // Resume ambient song if it was active
+  public resumeAmbient() {
+    if (this.bgAudio && this.isAmbientPlaying && !this.isMuted) {
+      this.bgAudio.volume = 0.35;
+      this.bgAudio.muted = false;
+      this.bgAudio.play().catch(() => {});
+    }
+  }
+
+  // Toggle ambient romantic song playback
+  public toggleAmbient(): boolean {
+    const audio = this.getOrCreateBgAudio();
+
+    if (this.isAmbientPlaying && !audio.paused) {
+      audio.pause();
       this.isAmbientPlaying = false;
       return false;
     } else {
-      this.bgAudio.play().then(() => {
-        this.isAmbientPlaying = true;
-      }).catch(() => {
-        this.isAmbientPlaying = false;
-      });
       this.isAmbientPlaying = true;
+      if (!this.isMuted) {
+        audio.volume = 0.35;
+        audio.muted = false;
+        audio.play().catch(() => {});
+      }
       return true;
     }
   }
 
   public getIsAmbientPlaying() {
-    return this.isAmbientPlaying;
+    return this.isAmbientPlaying && !this.isMuted;
   }
 }
 

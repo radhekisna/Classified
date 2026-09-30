@@ -23,7 +23,10 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
     const onLoadedMetadata = () => setDuration(audio.duration);
-    const onEnded = () => setIsPlaying(false);
+    const onEnded = () => {
+      setIsPlaying(false);
+      sound.resumeAmbient();
+    };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
@@ -44,11 +47,14 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
+      sound.resumeAmbient();
     } else {
+      sound.pauseAmbient();
       audio.play().then(() => {
         setIsPlaying(true);
       }).catch(() => {
         setIsPlaying(false);
+        sound.resumeAmbient();
       });
     }
   };

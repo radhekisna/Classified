@@ -76,6 +76,7 @@ export const App: React.FC = () => {
     const nextMuted = !soundMuted;
     setSoundMuted(nextMuted);
     sound.setMuted(nextMuted);
+    setAmbientPlaying(sound.getIsAmbientPlaying());
     if (!nextMuted) {
       sound.playClick();
     }
